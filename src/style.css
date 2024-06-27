@@ -1,0 +1,9 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+#canvas1 {
+  background:black;
+  max-height: 25%;
+  max-width: 25%;
+}
