@@ -96,6 +96,64 @@ export class Tetrimino {
         ],
       ],
     },
+    S: {
+      x: this.homePosX,
+      y: this.homePosY,
+      currentRotation: 0,
+      color: "red",
+      code: "S",
+      rotations: [
+        [
+          [1, 1, 0],
+          [0, 1, 1]
+        ],
+        [
+          [0, 1],
+          [1, 1],
+          [1, 0]
+        ],
+
+      ],
+    },
+    Z: {
+      x: this.homePosX,
+      y: this.homePosY,
+      currentRotation: 0,
+      color: "lightgreen",
+      code: "Z",
+      rotations: [
+        [
+          [0, 1, 1],
+          [1, 1, 0]
+        ],
+        [
+          [1, 0],
+          [1, 1],
+          [0, 1]
+        ],
+
+      ],
+    },
+    T: {
+      x: this.homePosX,
+      y: this.homePosY,
+      currentRotation: 0,
+      color: "pink",
+      code: "T",
+      rotations: [
+        [[0, 1],
+        [1, 1],
+        [0, 1]],
+        [[0, 1, 0],
+        [1, 1, 1]],
+        [[1, 0],
+        [1, 1],
+        [1, 0]],
+        [[1, 1, 1],
+        [0, 1, 0]],
+
+      ],
+    },
   };
   constructor(code: string) {
     this.currentShape = this.shapes[code];

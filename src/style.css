@@ -4,6 +4,8 @@
 
 #canvas1 {
   background:black;
-  max-height: 25%;
-  max-width: 25%;
+  color: white;
+  
+  max-width: 300px;
+
 }

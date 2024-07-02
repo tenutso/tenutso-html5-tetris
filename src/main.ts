@@ -5,6 +5,7 @@ import { Tetrimino } from "./shapes";
 const gameCanvas = new GameCanvas();
 let gameGrid: any = [];
 let t: any;
+let nextShape: any;
 
 function createGameGrid() {
   let row = [];
@@ -28,16 +29,6 @@ function drawShape(shapeObj: any) {
       }
     }
   }
-}
-
-function getShapeHeight(shape: any) {
-  const cr = shape.currentRotation;
-  return shape.rotations[cr].length;
-}
-
-function getShapeWidth(shape: any) {
-  const cr = shape.currentRotation;
-  return shape.rotations[cr][0].length;
 }
 
 function isCollide(shape: any, dest: string): string | boolean {
@@ -80,27 +71,6 @@ function isCollide(shape: any, dest: string): string | boolean {
   return false;
 }
 
-function checkFloorBoundry(shape: any) {
-  const { y } = shape;
-  // world boundies - floor
-  if (y + getShapeHeight(shape) === gameCanvas.gridHeight) return true;
-  // world boundies - left and right
-}
-
-function checkRightBoundry(shape: any) {
-  const { x } = shape;
-  if (x + getShapeWidth(shape) === gameCanvas.gridWidth) {
-    return true;
-  }
-}
-
-function checkLeftBoundry(shape: any) {
-  const { x } = shape;
-  if (x === 0) {
-    return true;
-  }
-}
-
 function addToGrid(shape: any) {
   const { x, y, code, currentRotation: cr, rotations } = shape;
 
@@ -124,12 +94,24 @@ function addToGrid(shape: any) {
   console.log("GRID", gameGrid);
 }
 
+const shapes = ["I", "J", "L", "O", "S", "T", "Z"];
+
 function spawnNewShape() {
-  const pieces: Array<string> = ["L", "J", "I", "O"];
+  const pieces: Array<string> = shapes;
+  let piece;
+  let r;
   // spawn a new shape
-  const r = Math.floor(Math.random() * pieces.length);
-  let piece = pieces[r];
-  t = new Tetrimino(piece);
+  if (nextShape) {
+    t = nextShape;
+  } else {
+    r = Math.floor(Math.random() * pieces.length);
+    piece = pieces[r];
+    t = new Tetrimino(piece);
+  }
+
+  r = Math.floor(Math.random() * shapes.length);
+  piece = shapes[r];
+  nextShape = new Tetrimino(piece);
 }
 
 //create game grid
@@ -140,52 +122,19 @@ spawnNewShape();
 
 // generate shapes on a timer
 const dropLoop = setInterval(() => {
-  // spawn a new shape only when no peices are in play
-  if (checkFloorBoundry(t.currentShape) || isCollide(t.currentShape, "Below")) {
-    addToGrid(t.currentShape);
-    spawnNewShape();
-  } else {
-    // move shape down the grid
-    t.currentShape.y += 1;
-  }
+  move("down");
   if (gameGrid[0].find((item: string) => item)) clearInterval(dropLoop);
 }, 500);
 
-//const shapes = ["I", "J", "L", "O", "S", "T", "Z"];
-
 document.onkeydown = function ({ code }) {
   if (code === "ArrowRight") {
-    if (
-      checkRightBoundry(t.currentShape) ||
-      isCollide(t.currentShape, "Right")
-    ) {
-      return;
-    }
-    t.currentShape.x += 1;
-    //renderShape(t.currentShape);
+    move("right");
   } else if (code === "ArrowLeft") {
-    if (checkLeftBoundry(t.currentShape) || isCollide(t.currentShape, "Left")) {
-      return;
-    }
-    t.currentShape.x -= 1;
-    //renderShape(t.currentShape);
+    move("left");
   } else if (code === "ArrowDown") {
-    if (
-      checkFloorBoundry(t.currentShape) ||
-      isCollide(t.currentShape, "Below")
-    ) {
-      addToGrid(t.currentShape);
-      spawnNewShape();
-    } else {
-      t.currentShape.y += 1;
-      //renderShape(t.currentShape);
-    }
+    move("down");
   } else if (code === "Space") {
-    // TODO: don't rotate if collision affects rotation
-    if (t.currentShape.currentRotation == 3) {
-      t.currentShape.currentRotation = 0;
-    } else t.currentShape.currentRotation += 1;
-    //renderShape(t.currentShape);
+    move("rotate");
   }
 };
 
@@ -202,16 +151,14 @@ const redrawGrid = () => {
     }
   }
 };
+
 const checkCompleteLines = () => {
   let count = 0;
-  let myEvent = new Event("customEventName");
 
   for (let y = 0; y < gameGrid.length; y++) {
     for (let x = 0; x < gameGrid[y].length; x++) {
       if (gameGrid[y][x]) count++;
       if (count === gameCanvas.gridWidth) {
-        //alert("Event Triggered");
-        //window.dispatchEvent(myEvent);
         count = 0;
         gameGrid.splice(y, 1);
         gameGrid.splice(0, 0, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
@@ -223,14 +170,83 @@ const checkCompleteLines = () => {
   }
 };
 
-window.addEventListener("customEventName", function (e) {
-  alert("Event Triggered");
-  // redraw grid here
-});
+function move(dir: string) {
+  let x = t.currentShape.x;
+  let y = t.currentShape.y;
+  let c = t.currentShape.currentRotation;
+  let w = t.currentShape.rotations[c][0].length;
+  let h = t.currentShape.rotations[c].length;
+  let r = t.currentShape.rotations.length - 1;
+
+  switch (dir) {
+    case "right":
+      if (x + w < gameCanvas.gridWidth && !isCollide(t.currentShape, "Right"))
+        t.currentShape.x += 1;
+      break;
+    case "left":
+      if (x > 0 && !isCollide(t.currentShape, "Left")) t.currentShape.x -= 1;
+      break;
+    case "down":
+      if (
+        y + h === gameCanvas.gridHeight ||
+        isCollide(t.currentShape, "Below")
+      ) {
+        addToGrid(t.currentShape);
+        spawnNewShape();
+      } else {
+        t.currentShape.y += 1;
+      }
+      break;
+    case "rotate":
+      if (
+        isCollide(t.currentShape, "Right") ||
+        isCollide(t.currentShape, "Left")
+      ) {
+        return;
+      }
+
+      // TODO: don't rotate if collision affects rotation
+      if (t.currentShape.currentRotation === r) {
+        t.currentShape.currentRotation = 0;
+      } else t.currentShape.currentRotation += 1;
+      break;
+  }
+}
+
+function drawNextShape() {
+  gameCanvas.ctx.beginPath();
+  gameCanvas.ctx.lineWidth=7;
+
+  gameCanvas.ctx.strokeStyle = "white";
+
+  gameCanvas.ctx.strokeRect(
+    gameCanvas.canvas.width - 350,
+    0,
+    350,
+    gameCanvas.canvas.height
+  );
+  gameCanvas.ctx.fillStyle = "#222222";
+
+  gameCanvas.ctx.fillRect(gameCanvas.canvas.width-350, 0, 350, gameCanvas.canvas.height)
+
+  gameCanvas.ctx.font = "50px Arial";
+  gameCanvas.ctx.fillStyle = "white";
+  gameCanvas.ctx?.fillText("Next Piece", gameCanvas.canvas.width - 300, 80);
+  // gameCanvas.ctx?.fillText(
+  //   nextShape.currentShape.code,
+  //   gameCanvas.canvas.width - 150,
+  //   140
+  // );
+  const next = structuredClone(nextShape.currentShape)
+  next.x=13;
+  next.y=2;
+  drawShape(next);
+}
 
 // GAME LOOP
 setInterval(() => {
   checkCompleteLines();
   redrawGrid();
   drawShape(t.currentShape);
+  drawNextShape();
 }, 10);
