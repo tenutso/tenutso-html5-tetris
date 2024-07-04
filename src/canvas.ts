@@ -9,7 +9,7 @@ class Canvas {
     if (!this.canvas) {
       throw new ReferenceError("Canvas not found");
     }
-    this.canvas.width = this.gridWidth * this.tileSize + 350;
+    this.canvas.width = this.gridWidth * this.tileSize + 384;
     this.canvas.height = this.gridHeight * this.tileSize;
     this.ctx = this.canvas.getContext("2d");
   }

@@ -6,6 +6,10 @@ const gameCanvas = new GameCanvas();
 let gameGrid: any = [];
 let t: any;
 let nextShape: any;
+let score = 0;
+let level = 1;
+let speed= 500;
+let dropLoopInterval = null;
 
 function createGameGrid() {
   let row = [];
@@ -121,10 +125,12 @@ createGameGrid();
 spawnNewShape();
 
 // generate shapes on a timer
-const dropLoop = setInterval(() => {
+const dropLoop = () => {
   move("down");
   if (gameGrid[0].find((item: string) => item)) clearInterval(dropLoop);
-}, 500);
+};
+
+dropLoopInterval = setInterval(dropLoop, speed);
 
 document.onkeydown = function ({ code }) {
   if (code === "ArrowRight") {
@@ -132,6 +138,7 @@ document.onkeydown = function ({ code }) {
   } else if (code === "ArrowLeft") {
     move("left");
   } else if (code === "ArrowDown") {
+    if (t.currentShape.y > 0)
     move("down");
   } else if (code === "Space") {
     move("rotate");
@@ -159,6 +166,34 @@ const checkCompleteLines = () => {
     for (let x = 0; x < gameGrid[y].length; x++) {
       if (gameGrid[y][x]) count++;
       if (count === gameCanvas.gridWidth) {
+        score += 100;
+        if (score === 2000) {
+          level = 2;
+          speed = 400;
+          clearInterval(dropLoopInterval);
+          dropLoopInterval = setInterval(dropLoop, speed);
+        } else if (score === 4000) {
+          level = 3;
+          speed = 300;
+          clearInterval(dropLoopInterval);
+          dropLoopInterval = setInterval(dropLoop, speed);
+     
+        } else if (score === 6000) {
+          level = 4;
+          speed = 200;
+          clearInterval(dropLoopInterval);
+          dropLoopInterval = setInterval(dropLoop, speed);
+     
+        } else if (score === 8000) {
+          level = 5;
+          speed = 150;
+          clearInterval(dropLoopInterval);
+          dropLoopInterval = setInterval(dropLoop, speed);
+     
+        } else if (score === 10000) {
+          level = 6;
+          
+        }
         count = 0;
         gameGrid.splice(y, 1);
         gameGrid.splice(0, 0, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
@@ -194,7 +229,8 @@ function move(dir: string) {
         addToGrid(t.currentShape);
         spawnNewShape();
       } else {
-        t.currentShape.y += 1;
+        
+          t.currentShape.y += 1;
       }
       break;
     case "rotate":
@@ -220,25 +256,33 @@ function drawNextShape() {
   gameCanvas.ctx.strokeStyle = "white";
 
   gameCanvas.ctx.strokeRect(
-    gameCanvas.canvas.width - 350,
+    gameCanvas.canvas.width - 384,
     0,
-    350,
+    384,
     gameCanvas.canvas.height
   );
-  gameCanvas.ctx.fillStyle = "#222222";
+  gameCanvas.ctx.fillStyle = "#444444";
 
-  gameCanvas.ctx.fillRect(gameCanvas.canvas.width-350, 0, 350, gameCanvas.canvas.height)
+  gameCanvas.ctx.fillRect(gameCanvas.canvas.width-384, 0, 384, gameCanvas.canvas.height)
 
   gameCanvas.ctx.font = "50px Arial";
   gameCanvas.ctx.fillStyle = "white";
   gameCanvas.ctx?.fillText("Next Piece", gameCanvas.canvas.width - 300, 80);
+  gameCanvas.ctx?.fillText("Score", gameCanvas.canvas.width - 250, 480);
+  gameCanvas.ctx?.fillText(score, gameCanvas.canvas.width - 250, 580);
+
+  gameCanvas.ctx?.fillText("Level", gameCanvas.canvas.width - 250, 880);
+  gameCanvas.ctx?.fillText(level, gameCanvas.canvas.width - 250, 980);
+
+  gameCanvas.ctx.closePath();
   // gameCanvas.ctx?.fillText(
   //   nextShape.currentShape.code,
   //   gameCanvas.canvas.width - 150,
   //   140
   // );
   const next = structuredClone(nextShape.currentShape)
-  next.x=13;
+  let offsetx = 3 - Math.floor(next.rotations[next.currentRotation][0].length / 2);
+  next.x=gameCanvas.gridWidth + offsetx;
   next.y=2;
   drawShape(next);
 }
