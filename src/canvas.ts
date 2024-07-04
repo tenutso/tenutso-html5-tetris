@@ -1,19 +1,20 @@
 class Canvas {
-  private ctx: CanvasRenderingContext2D | null;
-  public tileSize = 64;
-  public gridWidth = 12;
-  public gridHeight = 22;
-  
+  public ctx: CanvasRenderingContext2D;
+  public tileSize: number = 64;
+  public gridWidth: number = 12;
+  public gridHeight: number = 22;
+  public canvas: HTMLCanvasElement;
+
   constructor() {
-    this.canvas = document.querySelector<HTMLCanvasElement>("#canvas1");
+    this.canvas = <HTMLCanvasElement>document.querySelector("#canvas1");
     if (!this.canvas) {
       throw new ReferenceError("Canvas not found");
     }
     this.canvas.width = this.gridWidth * this.tileSize + 384;
     this.canvas.height = this.gridHeight * this.tileSize;
-    this.ctx = this.canvas.getContext("2d");
+    this.ctx = <CanvasRenderingContext2D>this.canvas.getContext("2d");
   }
-  draw(x: number, y: number, color: string) {
+  draw(x: number, y: number, color: string): void {
     if (!this.ctx) {
       throw new ReferenceError("2d Context not found");
     }
@@ -25,7 +26,7 @@ class Canvas {
     this.ctx.strokeRect(x, y, this.tileSize, this.tileSize);
   }
 
-  undraw(x: number, y: number) {
+  undraw(x: number, y: number): void {
     if (!this.ctx) {
       throw new ReferenceError("2d Context not found");
     }
@@ -33,18 +34,12 @@ class Canvas {
     y = y * this.tileSize;
     this.ctx.clearRect(x, y, this.tileSize, this.tileSize);
   }
-  clearGrid() {
-    if (!this.ctx) {
+  clearGrid(): void {
+    if (!this.ctx || !this.canvas) {
       throw new ReferenceError("2d Context not found");
     }
-    this.ctx.clearRect(
-      0,
-      0,
-      this.canvas.width,
-      this.canvas.height
-    );
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
-  
 }
 
 export default Canvas;

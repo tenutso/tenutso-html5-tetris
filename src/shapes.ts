@@ -1,6 +1,6 @@
-interface shapesT {
+export type shapesT = {
   [index: string]: shapeT;
-}
+};
 
 export type shapeT = {
   x: number;
@@ -11,9 +11,16 @@ export type shapeT = {
   rotations: Array<Array<Array<number>>>;
 };
 
+export type TetriminoT = {
+  homePosX: number;
+  homePosY: number;
+  currentShape: shapeT;
+  shapes: shapesT;
+};
+
 export class Tetrimino {
-  private homePosX = 5;
-  private homePosY = -3;
+  public homePosX = 5;
+  public homePosY = -3;
   public currentShape: shapeT;
   public shapes: shapesT = {
     J: {
@@ -77,10 +84,7 @@ export class Tetrimino {
       color: "cyan",
       code: "I",
       rotations: [
-        [[1], 
-        [1], 
-        [1], 
-        [1]],
+        [[1], [1], [1], [1]],
         [[1, 1, 1, 1]],
         [[1], [1], [1], [1]],
         [[1, 1, 1, 1]],
@@ -108,14 +112,13 @@ export class Tetrimino {
       rotations: [
         [
           [1, 1, 0],
-          [0, 1, 1]
+          [0, 1, 1],
         ],
         [
           [0, 1],
           [1, 1],
-          [1, 0]
+          [1, 0],
         ],
-
       ],
     },
     Z: {
@@ -127,14 +130,13 @@ export class Tetrimino {
       rotations: [
         [
           [0, 1, 1],
-          [1, 1, 0]
+          [1, 1, 0],
         ],
         [
           [1, 0],
           [1, 1],
-          [0, 1]
+          [0, 1],
         ],
-
       ],
     },
     T: {
@@ -144,17 +146,24 @@ export class Tetrimino {
       color: "pink",
       code: "T",
       rotations: [
-        [[0, 1],
-        [1, 1],
-        [0, 1]],
-        [[0, 1, 0],
-        [1, 1, 1]],
-        [[1, 0],
-        [1, 1],
-        [1, 0]],
-        [[1, 1, 1],
-        [0, 1, 0]],
-
+        [
+          [0, 1],
+          [1, 1],
+          [0, 1],
+        ],
+        [
+          [0, 1, 0],
+          [1, 1, 1],
+        ],
+        [
+          [1, 0],
+          [1, 1],
+          [1, 0],
+        ],
+        [
+          [1, 1, 1],
+          [0, 1, 0],
+        ],
       ],
     },
   };
