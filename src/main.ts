@@ -127,7 +127,7 @@ spawnNewShape();
 // generate shapes on a timer
 const dropLoop = () => {
   move("down");
-  if (gameGrid[0].find((item: string) => item)) clearInterval(dropLoop);
+  if (gameGrid[0].find((item: string) => item)) clearInterval(dropLoopInterval);
 };
 
 dropLoopInterval = setInterval(dropLoop, speed);
